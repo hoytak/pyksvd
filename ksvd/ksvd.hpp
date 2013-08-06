@@ -326,11 +326,11 @@ static void _BatchOMP(DestVector& gamma,
 
 template <typename MatrixType1, typename IntMatrixType, typename MatrixType2, typename MatrixType3> 
 void OMPEncodeSignal(MatrixType1& Gamma,
-		     IntMatrixType& Indices,
-		     const MatrixType2& D,
-		     const MatrixType3& X,
-		     size_t sparsity,
-		     const param_t& _options = param_t()) {
+                     IntMatrixType& Indices,
+                     const MatrixType2& D,
+                     const MatrixType3& X,
+                     size_t sparsity,
+                     const param_t& _options) {
 
   Eigen::setNbThreads(1);
 
@@ -452,12 +452,12 @@ void OMPEncodeSignal(MatrixType1& Gamma,
   }
 }
 
-template <typename MatrixType1, typename IntMatrixType, typename MatrixType2> 
+template <typename MatrixType1, typename MatrixType2> 
 void OMPEncodeSignal(MatrixType1& Gamma,
-		  const MatrixType1& D,
-		  const MatrixType2& X,
-		  size_t sparsity,
-		  const param_t& options) {
+                     const MatrixType1& D,
+                     const MatrixType2& X,
+                     size_t sparsity,
+                     const param_t& options) {
 
   Matrix<size_t, Dynamic, Dynamic> int_dummy(0,0);
   OMPEncodeSignal(Gamma, int_dummy, D, X, sparsity, options);
@@ -1036,6 +1036,18 @@ void _KSVDNumpyWrapper(double *Dptr, double *Gammaptr,
     Map<Matrix<double, Dynamic, Dynamic, RowMajor> > X(Xptr, n, p);
 
     KSVD(D, Gamma, X, target_sparsity, max_iterations, params);
+}
+
+void _KSVDEncodeNumpyWrapper(double *Gammaptr, double *Dptr,  
+                             double *Xptr, size_t n, size_t d, size_t p,
+                             size_t target_sparsity,
+                             param_t params)
+{
+    Map<Matrix<double, Dynamic, Dynamic, RowMajor> > Gamma(Gammaptr, n, d);
+    Map<Matrix<double, Dynamic, Dynamic, RowMajor> > D(Dptr, d, p);
+    Map<Matrix<double, Dynamic, Dynamic, RowMajor> > X(Xptr, n, p);
+
+    OMPEncodeSignal(Gamma, D, X, target_sparsity, params);
 }
 
 #endif /* _KSVD_H_ */

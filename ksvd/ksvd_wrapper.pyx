@@ -11,6 +11,12 @@ cdef extern from "ksvd.hpp":
                            double *Xptr, size_t n, size_t d, size_t p,
                            size_t target_sparsity, size_t max_iterations,
                            map[string, double] params) except +
+
+    void _KSVDEncodeNumpyWrapper(double *Gammaptr, double *Dptr,  
+                             double *Xptr, size_t n, size_t d, size_t p,
+                             size_t target_sparsity,
+                             map[string, double] params) except +
+
     
 def KSVD(Xo,
          size_t dict_size,
@@ -123,8 +129,6 @@ def KSVD(Xo,
     params["max_initial_32bit_iterations"] = max_initial_32bit_iterations
     params["enable_32bit_initialization"] = enable_32bit_initialization
 
-    print grad_descent_iterations
-
     if type(D_init) is str:
         if D_init.lower() == "svd":
             params["initialize_from_svd"] = True
@@ -146,3 +150,32 @@ def KSVD(Xo,
     
     return D, Gamma
     
+def KSVD_Encode(Xo, Do, size_t sparsity):
+    """
+    Encode a signal X of size n by p using a precomputed dictionary D
+    of size d by p. and sparsity `sparsity`.  Returns Gamma, the
+    encoded basis.
+    """
+
+    cdef ar[double, ndim=2, mode='c'] X = ascontiguousarray(Xo, dtype='d')
+    cdef ar[double, ndim=2, mode='c'] D = ascontiguousarray(Do, dtype='d')
+    
+    cdef size_t n = X.shape[0]
+    cdef size_t p = X.shape[1]
+    cdef size_t dict_size = D.shape[0]
+
+    cdef ar[double, ndim=2, mode='c'] Gamma = empty( (n, dict_size) )
+    
+    if sparsity >= dict_size:
+        raise ValueError("Target sparsity (%d) >= Dictionary size (%d)"
+                         % (sparsity, dict_size))
+
+    cdef map[string, double] params
+
+    _KSVDEncodeNumpyWrapper(&Gamma[0,0], &D[0,0], &X[0,0], n, dict_size, p,
+                            sparsity,
+                            params)
+    
+    return Gamma
+    
+
