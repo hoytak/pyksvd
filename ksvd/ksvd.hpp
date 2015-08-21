@@ -3,7 +3,6 @@
 
 // Implements the K-SVD algorithm with batch omp.  Reentrant.
 
-#include <../third-party/eigen/Eigen/Dense>
 #include <exception>
 #include <vector>
 #include <iostream>
@@ -12,8 +11,10 @@
 #include <type_traits>
 #include <map>
 #include <set>
-#include "debug.hpp"
 #include <omp.h>
+
+#include "debug.hpp"
+#include "../third-party/eigen/Eigen/Dense"
 
 using namespace std;
 using namespace Eigen;
