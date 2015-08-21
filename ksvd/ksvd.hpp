@@ -3,7 +3,7 @@
 
 // Implements the K-SVD algorithm with batch omp.  Reentrant.
 
-#include <eigen3/Eigen/Dense>
+#include <../third-party/eigen/Eigen/Dense>
 #include <exception>
 #include <vector>
 #include <iostream>
