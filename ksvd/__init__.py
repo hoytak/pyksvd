@@ -1,1 +1,1 @@
-from ksvd_wrapper import KSVD, KSVD_Encode
+from .ksvd_wrapper import KSVD, KSVD_Encode
