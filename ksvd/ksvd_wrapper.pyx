@@ -7,17 +7,17 @@ from libcpp.string cimport string
 
 cdef extern from "ksvd.hpp":
 
-    void _KSVDNumpyWrapper(double *Dptr, double *Gammaptr, 
+    void _KSVDNumpyWrapper(double *Dptr, double *Gammaptr,
                            double *Xptr, size_t n, size_t d, size_t p,
                            size_t target_sparsity, size_t max_iterations,
                            map[string, double] params) except +
 
-    void _KSVDEncodeNumpyWrapper(double *Gammaptr, double *Dptr,  
+    void _KSVDEncodeNumpyWrapper(double *Gammaptr, double *Dptr,
                              double *Xptr, size_t n, size_t d, size_t p,
                              size_t target_sparsity,
                              map[string, double] params) except +
 
-    
+
 def KSVD(Xo,
          size_t dict_size,
          size_t target_sparsity,
@@ -35,7 +35,7 @@ def KSVD(Xo,
          ):
     """
     KSVD(X,dict_size, target_sparsity,max_iterations,D_init = 'random', enable_printing = False, print_interval = 25, grad_descent_iterations = 2, convergence_check_interval = 50, convergence_threshhold = 0, enable_eigen_threading = False, enable_threading = True, enable_32bit_initialization = True, max_initial_32bit_iterations = 0)
-    
+
     Runs an approximate KSVD algorithm using batch orthogonal matching pursuit.
 
     :`X`:
@@ -50,7 +50,7 @@ def KSVD(Xo,
 
     :`max_iterations`:
       The maximum number of iterations to perform.  Generally takes 500-5000.
-    
+
     :`D_init`:
       Initialization mode of the dictionary.  If a `dict_size` by `p`
       array is given, then this is used to initialize the dictionary.
@@ -85,19 +85,19 @@ def KSVD(Xo,
       Whether to enable threading in linear algebra operations in the
       Eigen libraries.  This is recommended only for very large
       problems. (default = False).
-    
+
     :`enable_threading`:
       Whether to enable threading in calculating the sparse
       projections in the Batch OMP step.  Generally, this can give
       substantial speedup. (default = True).
-    
+
     :`enable_32bit_initialization`:
       Whether to process as much as possible using the faster 32bit
       mode.  This is generally recommended, as the accuracy is
       typically good enough for the start of most problems.  Once the
       accuracy falls below what 32bit floats can accurately determine,
       the computation switches to 64bit.
-    
+
     :`max_initial_32bit_iterations`:
       The maximum number of 32 bit iterations to do before switching
       to 64bit mode.  If 0 (default), no limit.
@@ -147,9 +147,9 @@ def KSVD(Xo,
     _KSVDNumpyWrapper(&D[0,0], &Gamma[0,0], &X[0,0], n, dict_size, p,
                       target_sparsity, max_iterations,
                       params)
-    
+
     return D, Gamma
-    
+
 def KSVD_Encode(Xo, Do, size_t sparsity):
     """
     Encode a signal X of size n by p using a precomputed dictionary D
@@ -159,13 +159,13 @@ def KSVD_Encode(Xo, Do, size_t sparsity):
 
     cdef ar[double, ndim=2, mode='c'] X = ascontiguousarray(Xo, dtype='d')
     cdef ar[double, ndim=2, mode='c'] D = ascontiguousarray(Do, dtype='d')
-    
+
     cdef size_t n = X.shape[0]
     cdef size_t p = X.shape[1]
     cdef size_t dict_size = D.shape[0]
 
     cdef ar[double, ndim=2, mode='c'] Gamma = empty( (n, dict_size) )
-    
+
     if sparsity >= dict_size:
         raise ValueError("Target sparsity (%d) >= Dictionary size (%d)"
                          % (sparsity, dict_size))
@@ -175,7 +175,7 @@ def KSVD_Encode(Xo, Do, size_t sparsity):
     _KSVDEncodeNumpyWrapper(&Gamma[0,0], &D[0,0], &X[0,0], n, dict_size, p,
                             sparsity,
                             params)
-    
+
     return Gamma
-    
+
 
