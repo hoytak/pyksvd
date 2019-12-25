@@ -544,8 +544,8 @@ static size_t _KSVD_internal(MatrixType& D,
 
   // size_t iter_first_scaleup = size_t(max_iterations * first_scaleup_iterations);
   // size_t iter_second_scaleup = iter_first_scaleup + size_t(max_iterations * second_scaleup_iterations);
-
-  cout << "grad_descent_iterations = " << grad_descent_iterations << endl;
+  if(enable_printing)
+    cout << "grad_descent_iterations = " << grad_descent_iterations << endl;
 
   if(size_t(Gamma.rows()) != n)
     throw invalid_argument("Number of rows in Gamma much match number of rows in X.");
