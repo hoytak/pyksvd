@@ -24,7 +24,7 @@ if __name__ == "__main__":
     del M
     del D
 
-    print "X generated."
+    print("X generated.")
 
     KSVD(X, dict_size, target_sparsity, 50,
          print_interval = 25,
